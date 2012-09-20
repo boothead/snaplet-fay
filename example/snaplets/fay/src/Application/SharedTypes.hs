@@ -12,6 +12,10 @@ data Time = Time { time :: String }
             deriving (Read,Data,Typeable,Show)
 instance Foreign Time
 
+data TimeStamp = TS { ts :: Int }
+            deriving (Read,Data,Typeable,Show)
+instance Foreign TimeStamp
+
 data UserRegister = UserRegister { user :: String, password :: String, passwordConfirmation :: String }
                     deriving (Read,Data,Typeable,Show)
 instance Foreign UserRegister

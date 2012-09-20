@@ -29,14 +29,31 @@ onload :: Fay ()
 onload = void $ do
   contents <- select "#content"
   div <- select "<div></div>"
-  setHtml "This element was created by Fay through an onload handler!" div
+  setHtml "This element was created by Fay through an onload handler by Ben!" div
   appendTo contents div
 
-  setTimeout 5000 currentTime
+  setTimeout 1000 currentTimeStamp
 
 currentTime :: Fay ()
 currentTime =
   ajaxJson "/ajax/current-time" $ \(Time time) -> void $ select "#current-time" >>= setHtml time
+
+data DateTime
+instance Foreign DateTime
+
+timeStampToDt :: Int -> Fay (DateTime)
+timeStampToDt = ffi "new DateTime(%1)"
+
+dateTimeStr :: DateTime -> Fay (String)
+dateTimeStr = ffi "%1.toString()"
+
+currentTimeStamp :: Fay ()
+currentTimeStamp =
+  ajaxJson "/ajax/time-stamp" $ \(TS time) -> do
+           tm <- timeStampToDt (time * 1000) >>= dateTimeStr
+           e <- select "#current-time"
+           setHtml e tm
+
 
 formOnload :: String -> Fay () -> Fay ()
 formOnload buttonSel getForm = void $ select buttonSel >>= click getForm
@@ -47,7 +64,7 @@ registrationOnload = formOnload "#viewRegisterForm" requestRegisterHtml
 loginOnload :: Fay ()
 loginOnload = formOnload "#viewLoginForm" requestLoginHtml
 
-requestHtml :: String -> Fay () -> Fay ()ick
+requestHtml :: String -> Fay () -> Fay ()
 requestHtml url submitAction = do
   formContainer <- select "#formContainer"
   hide "slow" formContainer

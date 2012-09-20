@@ -18,6 +18,7 @@ import           Snap.Snaplet.Fay
 import           Snap.Snaplet.Heist
 import           Snap.Snaplet.Session.Backends.CookieSession
 import           Snap.Util.FileServe
+import           System.Posix.Time
 ------------------------------------------------------------------------------
 import           Application
 import           Application.SharedTypes
@@ -25,6 +26,11 @@ import           Application.SharedTypes
 
 currentTimeAjax :: AppHandler Time
 currentTimeAjax = Time . show <$> liftIO getCurrentTime
+
+timeStamp :: AppHandler TimeStamp
+timeStamp = TS <$> (liftIO $ do
+          time <- epochTime
+          return $ fromEnum time)
 
 -- TODO this can be handled automatically by heistServe
 registerForm :: AppHandler ()
@@ -50,6 +56,7 @@ login (UserLogin u p r) =
 routes :: [(ByteString, Handler App App ())]
 routes = [
            ("/ajax/current-time",  toFayax currentTimeAjax)
+         ,  ("/ajax/time-stamp",  toFayax timeStamp)
          , ("/ajax/login",         with auth $ fayax login)
          , ("/ajax/login-form",    loginForm)
          , ("/ajax/logout",        with auth logout)
